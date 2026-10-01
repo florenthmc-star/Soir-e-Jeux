@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soirée jeux</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0F12; --panel:#17191E; --line:#2A2D35; --pill:#3A3D46;
+  --text:#F2F3F5; --soft:#D5D8DE; --body:#C3C7CF; --muted:#9EA3AE;
+  --gap:clamp(10px,2.2vh,28px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans','Segoe UI',system-ui,sans-serif}
+
+/* Tout tient dans l'écran : la page fait exactement la hauteur de la fenêtre */
+.page{height:100vh;height:100dvh;max-width:1800px;margin:0 auto;padding:clamp(12px,3vh,44px) clamp(14px,3vw,56px);display:flex;flex-direction:column;gap:var(--gap)}
+
+.head{flex:none;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 32px}
+.eyebrow{font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(12px,1.7vh,17px);font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+h1{margin:6px 0 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(28px,6.4vh,68px);line-height:1;font-weight:700}
+.whoblock{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.wholabel{font-size:clamp(12px,1.5vh,15px);color:var(--muted)}
+.pills{display:flex;flex-wrap:wrap;gap:10px}
+.pill{min-height:clamp(36px,4.6vh,46px);padding:0 16px;border:1px solid var(--pill);border-radius:999px;background:transparent;font:clamp(13px,1.7vh,16px) 'IBM Plex Sans',system-ui,sans-serif;color:var(--soft);cursor:pointer}
+.pill:hover{border-color:var(--muted)}
+.pill[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:var(--bg);font-weight:600}
+
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.6vw,28px)}
+.card{display:flex;flex-direction:column;min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.card.mine{border-color:var(--c);box-shadow:0 0 0 1px var(--c)}
+.card .bar{flex:none;height:8px;background:var(--c)}
+.card .in{flex:1;min-height:0;padding:clamp(12px,2.6vh,32px) clamp(14px,1.8vw,32px);display:flex;flex-direction:column;gap:clamp(8px,1.7vh,20px)}
+.tag{font-size:clamp(11px,1.45vh,14px);font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--c)}
+.card h2{margin:4px 0 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(22px,4.4vh,46px);line-height:1.05;font-weight:700}
+.desc{margin:6px 0 0;font-size:clamp(13px,1.75vh,18px);line-height:1.45;color:var(--body)}
+.specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(6px,1.3vh,16px) 18px}
+.k{font-size:clamp(10px,1.3vh,12px);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.v{font-size:clamp(13px,1.8vh,18px);font-weight:500;margin-top:2px}
+.sep{flex:none;height:1px;background:var(--line)}
+.points{display:flex;flex-direction:column;gap:clamp(4px,1vh,10px)}
+.pt{display:flex;gap:10px;align-items:flex-start;font-size:clamp(13px,1.7vh,17px);line-height:1.4}
+.pt b{flex-shrink:0;width:16px}
+.pt.plus b{color:var(--c)}
+.pt.minus b{color:var(--muted)}
+.pt.minus span{color:var(--body)}
+
+.votezone{margin-top:auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 14px;padding-top:clamp(8px,1.6vh,18px);border-top:1px solid var(--line)}
+.tally{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.num{font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(24px,3.6vh,38px);font-weight:700;line-height:1}
+.lbl{color:var(--muted);font-size:clamp(13px,1.6vh,16px);margin-right:4px}
+.chip{padding:3px 10px;border-radius:999px;background:var(--c);color:#141414;font-weight:600;font-size:clamp(12px,1.5vh,14px)}
+.votebtn{min-height:clamp(38px,5vh,50px);padding:0 18px;border-radius:12px;border:2px solid var(--c);background:transparent;color:var(--text);font:600 clamp(14px,1.8vh,17px) 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.votebtn:hover{background:rgba(255,255,255,.05)}
+.card.mine .votebtn{background:var(--c);color:#141414}
+
+.banner{flex:none;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 28px;padding:clamp(10px,2vh,24px) clamp(16px,2vw,32px);background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.banner .big{font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(16px,2.5vh,24px);font-weight:700}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.leader{font-size:clamp(14px,1.8vh,18px);color:var(--soft)}
+.status{font-size:clamp(12px,1.5vh,14px);color:var(--muted);margin:0}
+.status:empty{display:none}
+button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
+
+/* Petits écrans (téléphone, fenêtre étroite) : on empile et on autorise le défilement */
+@media (max-width:980px), (max-height:560px){
+  .page{height:auto;min-height:100dvh}
+  .grid{grid-template-columns:1fr}
+  .right{align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="head">
+    <div>
+      <div class="eyebrow">Soirée jeux · Jeudi 8 octobre - Flo, Joachim &amp; Seb</div>
+      <h1>On joue à quoi ?</h1>
+    </div>
+    <div class="whoblock">
+      <div class="wholabel" id="wholabel">Clique sur ton prénom pour voter</div>
+      <div class="pills" id="pills"></div>
+    </div>
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <div class="banner">
+    <div class="big">Les trois sont gratuits et sans abonnement console. Votez !</div>
+    <div class="right">
+      <div class="leader" id="leader" aria-live="polite"></div>
+      <p class="status" id="status" role="status"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ⚙️ URL de ton déploiement Apps Script (se termine par /exec)
+  var API_URL = 'https://script.google.com/macros/s/AKfycbzdOxivRDLAQTvec8yoe0SssCrpdUyPffNJcF_wYS1NfoVhpFX6luHrM9XEKU7Rxrz9dw/exec';
+
+  var PEOPLE = [
+    {name:'Joachim', platform:'Xbox'},
+    {name:'Seb', platform:'PlayStation'},
+    {name:'Flo', platform:'PC'}
+  ];
+
+  // Pour ajouter un jeu : l'ajouter ici ET dans GAMES de Code.gs (même id)
+  var GAMES = [
+    { id:'finals', name:'The Finals', color:'#FF7A1A', tag:'Notre classique',
+      desc:'FPS en arène où tout le décor se détruit : on rase des bâtiments pour piquer l\u2019argent aux autres équipes.',
+      specs:[['Vue','1re personne'],['Équipes','Escouades de 3'],['Prix','Gratuit'],['Crossplay','PC · PS5 · Xbox']],
+      plus:['Escouade de 3, on joue entre nous sans inconnu','On connaît déjà le jeu, zéro temps d\u2019apprentissage'],
+      minus:['Pas de nouveauté, c\u2019est notre jeu habituel'] },
+    { id:'rivals', name:'Marvel Rivals', color:'#5B9BFF', tag:'La nouveauté',
+      desc:'Hero shooter avec les super-héros Marvel : chacun choisit un personnage aux pouvoirs uniques et un rôle dans l\u2019équipe.',
+      specs:[['Vue','3e personne'],['Équipes','6 contre 6'],['Prix','Gratuit'],['Crossplay','PC · PS5 · Xbox']],
+      plus:['Du neuf, et des rôles soutien où chacun peut s\u2019amuser','Beaucoup de héros'],
+      minus:['Équipes de 6 : on joue avec 3 inconnus','Crossplay PC/console en parties normales seulement, pas en classé'] },
+    { id:'fall', name:'Fall Guys', color:'#FF8FC8', tag:'La soirée fun',
+      desc:'Party game à obstacles : des manches courtes et loufoques où il faut survivre jusqu\u2019à la couronne finale.',
+      specs:[['Vue','3e personne'],['Équipes','Solo ou escouade'],['Prix','Gratuit'],['Crossplay','PC · PS5 · Xbox · Switch']],
+      plus:['Fous rires, le niveau compte peu : tout le monde peut gagner','Ultra simple, on le prend en main en deux minutes'],
+      minus:['Pas de tir : plus détente que compétitif','Compte Epic Games nécessaire'] }
+  ];
+
+  var state = { who:null, votes:{}, busy:false };
+  try { var s = localStorage.getItem('vote-who'); if (PEOPLE.some(function(p){return p.name===s;})) state.who = s; } catch(e){}
+
+  var pillsEl = document.getElementById('pills');
+  var whoLabel = document.getElementById('wholabel');
+  var gridEl = document.getElementById('grid');
+  var leaderEl = document.getElementById('leader');
+  var statusEl = document.getElementById('status');
+  function setStatus(t){ statusEl.textContent = t || ''; }
+
+  function el(tag, cls, text){
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function api(params){
+    var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+    return fetch(API_URL + '?' + qs, { method:'GET' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if (!d || !d.ok) throw new Error(d && d.error || 'Erreur'); return d.votes || {}; });
+  }
+
+  function render(){
+    pillsEl.textContent = '';
+    PEOPLE.forEach(function(p){
+      var b = el('button','pill', p.name + ' · ' + p.platform);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', state.who === p.name ? 'true' : 'false');
+      b.addEventListener('click', function(){
+        state.who = p.name;
+        try { localStorage.setItem('vote-who', p.name); } catch(e){}
+        setStatus(''); render();
+      });
+      pillsEl.appendChild(b);
+    });
+    whoLabel.textContent = state.who ? 'Tu votes en tant que ' + state.who : 'Clique sur ton prénom pour voter';
+
+    var res = {}; GAMES.forEach(function(g){ res[g.id] = []; });
+    PEOPLE.forEach(function(p){ var g = state.votes[p.name]; if (res[g]) res[g].push(p.name); });
+    var myGame = state.who ? state.votes[state.who] : null;
+
+    gridEl.textContent = '';
+    gridEl.style.gridTemplateColumns = window.matchMedia('(max-width:980px), (max-height:560px)').matches ? '' : 'repeat(' + GAMES.length + ',minmax(0,1fr))';
+    GAMES.forEach(function(g){
+      var card = el('article','card' + (myGame === g.id ? ' mine' : ''));
+      card.style.setProperty('--c', g.color);
+      card.appendChild(el('div','bar'));
+      var inner = el('div','in');
+
+      var top = el('div');
+      top.appendChild(el('div','tag', g.tag));
+      top.appendChild(el('h2', null, g.name));
+      top.appendChild(el('p','desc', g.desc));
+      inner.appendChild(top);
+
+      var specs = el('div','specs');
+      g.specs.forEach(function(kv){
+        var d = el('div'); d.appendChild(el('div','k',kv[0])); d.appendChild(el('div','v',kv[1])); specs.appendChild(d);
+      });
+      inner.appendChild(specs);
+      inner.appendChild(el('div','sep'));
+
+      var pts = el('div','points');
+      pts.appendChild(el('div','k','Pour nous 3'));
+      g.plus.forEach(function(t){ var r = el('div','pt plus'); r.appendChild(el('b',null,'+')); r.appendChild(el('span',null,t)); pts.appendChild(r); });
+      g.minus.forEach(function(t){ var r = el('div','pt minus'); r.appendChild(el('b',null,'\u2013')); r.appendChild(el('span',null,t)); pts.appendChild(r); });
+      inner.appendChild(pts);
+
+      var vz = el('div','votezone');
+      var tally = el('div','tally');
+      var n = res[g.id].length;
+      tally.appendChild(el('span','num', String(n)));
+      tally.appendChild(el('span','lbl', n > 1 ? 'votes' : 'vote'));
+      res[g.id].forEach(function(p){ tally.appendChild(el('span','chip',p)); });
+      vz.appendChild(tally);
+      var btn = el('button','votebtn', myGame === g.id ? 'Ton choix' : 'Voter');
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'Voter pour ' + g.name);
+      btn.setAttribute('aria-pressed', myGame === g.id ? 'true' : 'false');
+      btn.addEventListener('click', function(){ vote(g.id); });
+      vz.appendChild(btn);
+      inner.appendChild(vz);
+
+      card.appendChild(inner);
+      gridEl.appendChild(card);
+    });
+
+    var total = Object.keys(state.votes).filter(function(k){ return res[state.votes[k]]; }).length;
+    var sorted = GAMES.map(function(g){ return {g:g, n:res[g.id].length}; }).sort(function(a,b){ return b.n - a.n; });
+    if (total === 0) leaderEl.textContent = 'Personne n\u2019a encore voté.';
+    else if (sorted.length > 1 && sorted[0].n === sorted[1].n) leaderEl.textContent = '\u00c9galité pour l\u2019instant · ' + total + '/' + PEOPLE.length + ' votes';
+    else leaderEl.textContent = sorted[0].g.name + ' mène · ' + total + '/' + PEOPLE.length + ' votes';
+  }
+
+  function vote(gameId){
+    if (state.busy) return;
+    if (!state.who){ setStatus('Clique d\u2019abord sur ton prénom en haut de la page.'); return; }
+    state.busy = true;
+    var who = state.who;
+    setStatus('Enregistrement du vote…');
+    api({action:'vote', who:who, game:gameId}).then(function(v){
+      state.votes = v;
+      var g = GAMES.filter(function(x){ return x.id === gameId; })[0];
+      setStatus('Vote enregistré : ' + who + ' \u2192 ' + g.name + '.');
+      render();
+    }).catch(function(){
+      setStatus('Le vote n\u2019est pas passé, réessaie dans un instant.');
+    }).then(function(){ state.busy = false; });
+  }
+
+  function refresh(){
+    if (state.busy || document.hidden) return;
+    api({action:'votes'}).then(function(v){ state.votes = v; render(); }).catch(function(){});
+  }
+
+  window.addEventListener('resize', render);
+  render();
+  if (API_URL.indexOf('http') !== 0) setStatus('Colle l\u2019URL /exec d\u2019Apps Script dans API_URL (index.html).');
+  else { refresh(); setInterval(refresh, 5000); }
+})();
+</script>
+</body>
+</html>
