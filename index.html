@@ -35,7 +35,10 @@ h1{margin:4px 0 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:cla
 .grid::-webkit-scrollbar{height:8px}
 .grid::-webkit-scrollbar-thumb{background:var(--pill);border-radius:999px}
 .grid > .card{flex:0 0 clamp(280px,27vw,420px);scroll-snap-align:start}
-.grid.drag{scroll-snap-type:none;scroll-behavior:auto;cursor:grabbing;user-select:none}
+.grid{cursor:grab}
+.grid button{cursor:pointer}
+.grid.drag{scroll-snap-type:none !important;scroll-behavior:auto !important;cursor:grabbing}
+.grid.drag *{user-select:none;pointer-events:none}
 .arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:48px;height:48px;border-radius:999px;border:1px solid var(--pill);background:rgba(23,25,30,.92);color:var(--text);font:700 22px 'Chakra Petch',system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.45)}
 .arrow:hover{border-color:var(--muted)}
 .arrow[hidden]{display:none}
@@ -159,9 +162,9 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
       minus:['Avec Flo sur PC, on affronte des joueurs PC','Prise en main longue, jeu figé depuis juin 2026'] },
     { id:'helldivers', name:'Helldivers 2', color:'#FFD23F', tag:'La coop',
       desc:'Shooter coop contre aliens et robots : on enchaîne les missions en escouade et on appelle des frappes orbitales.',
-      specs:[['Vue','3e personne'],['Équipes','Coop jusqu\u2019à 4'],['Prix','Payant'],['Crossplay','PC · PS5 · Xbox']],
+      specs:[['Vue','3e personne'],['Équipes','Coop jusqu\u2019à 4'],['Prix','39,99 € (dès ~25 € en clé)'],['Crossplay','PC · PS5 · Xbox']],
       plus:['100 % coop : tout le monde est utile','Tir allié activé, fous rires garantis'],
-      minus:['Pas de PvP','Payant, et Game Pass / PS Plus requis en ligne'] }
+      minus:['Pas de PvP','Payant pour chacun, + Game Pass / PS Plus en ligne'] }
   ];
 
   var state = { who:null, votes:{}, busy:false };
@@ -183,9 +186,14 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
 
   function api(params){
     var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
-    return fetch(API_URL + '?' + qs, { method:'GET' })
-      .then(function(r){ return r.json(); })
-      .then(function(d){ if (!d || !d.ok) throw new Error(d && d.error || 'Erreur'); return d.votes || {}; });
+    return fetch(API_URL + '?' + qs, { method:'GET', redirect:'follow' })
+      .catch(function(){ throw new Error('Impossible de joindre Apps Script : vérifie l\u2019URL /exec et que l\u2019accès est sur « Tout le monde ».'); })
+      .then(function(r){ return r.text(); })
+      .then(function(t){
+        var d; try { d = JSON.parse(t); } catch(e){ throw new Error('Apps Script ne renvoie pas les votes : publie une nouvelle version du déploiement avec le nouveau Code.gs.'); }
+        if (!d || !d.ok) throw new Error('Erreur Apps Script : ' + (d && d.error || 'inconnue'));
+        return d.votes || {};
+      });
   }
 
   function render(){
@@ -260,7 +268,8 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
 
     var total = Object.keys(state.votes).filter(function(k){ return res[state.votes[k]]; }).length;
     var sorted = GAMES.map(function(g){ return {g:g, n:res[g.id].length}; }).sort(function(a,b){ return b.n - a.n; });
-    if (total === 0) leaderEl.textContent = 'Personne n\u2019a encore voté.';
+    if (!state.loaded) leaderEl.textContent = 'Chargement des votes\u2026';
+    else if (total === 0) leaderEl.textContent = 'Personne n\u2019a encore voté.';
     else if (sorted.length > 1 && sorted[0].n === sorted[1].n) leaderEl.textContent = '\u00c9galité pour l\u2019instant · ' + total + '/' + PEOPLE.length + ' votes';
     else leaderEl.textContent = sorted[0].g.name + ' mène · ' + total + '/' + PEOPLE.length + ' votes';
   }
@@ -276,14 +285,21 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
       var g = GAMES.filter(function(x){ return x.id === gameId; })[0];
       setStatus('Vote enregistré : ' + who + ' \u2192 ' + g.name + '.');
       render();
-    }).catch(function(){
-      setStatus('Le vote n\u2019est pas passé, réessaie dans un instant.');
+    }).catch(function(err){
+      setStatus('Le vote n\u2019est pas passé. ' + (err && err.message || ''));
     }).then(function(){ state.busy = false; });
   }
 
   function refresh(){
     if (state.busy || document.hidden) return;
-    api({action:'votes'}).then(function(v){ state.votes = v; render(); }).catch(function(){});
+    api({action:'votes'}).then(function(v){
+      state.votes = v; state.loaded = true;
+      if (state.loadError){ state.loadError = false; setStatus(''); }
+      render();
+    }).catch(function(err){
+      state.loadError = true;
+      setStatus(err && err.message || 'Impossible de charger les votes.');
+    });
   }
 
   // Défilement horizontal : flèches, molette, glisser à la souris
@@ -308,25 +324,28 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     if (e.key === 'ArrowRight'){ e.preventDefault(); gridEl.scrollBy({left:step(), behavior:'smooth'}); }
     if (e.key === 'ArrowLeft'){ e.preventDefault(); gridEl.scrollBy({left:-step(), behavior:'smooth'}); }
   });
-  var drag = null;
-  gridEl.addEventListener('pointerdown', function(e){
-    if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('button')) return;
+  var drag = null, justDragged = false;
+  gridEl.addEventListener('mousedown', function(e){
+    if (e.button !== 0 || e.target.closest('button')) return;
+    e.preventDefault(); // empêche la sélection de texte qui bloque le glisser
     drag = {x:e.clientX, left:gridEl.scrollLeft, moved:false};
   });
-  window.addEventListener('pointermove', function(e){
+  window.addEventListener('mousemove', function(e){
     if (!drag) return;
     var dx = e.clientX - drag.x;
-    if (!drag.moved && Math.abs(dx) > 5){ drag.moved = true; gridEl.classList.add('drag'); }
-    if (drag.moved) gridEl.scrollLeft = drag.left - dx;
+    if (!drag.moved && Math.abs(dx) > 4){ drag.moved = true; gridEl.classList.add('drag'); }
+    if (drag.moved){ e.preventDefault(); gridEl.scrollLeft = drag.left - dx; }
   });
-  window.addEventListener('pointerup', function(){
+  window.addEventListener('mouseup', function(){
     if (!drag) return;
     var moved = drag.moved; drag = null;
-    if (moved){
-      gridEl.classList.remove('drag');
-      var w = step(); gridEl.scrollTo({left:Math.round(gridEl.scrollLeft / w) * w, behavior:'smooth'});
-    }
+    if (!moved) return;
+    justDragged = true; setTimeout(function(){ justDragged = false; }, 50);
+    gridEl.classList.remove('drag');
+    var w = step(); gridEl.scrollTo({left:Math.round(gridEl.scrollLeft / w) * w, behavior:'smooth'});
   });
+  gridEl.addEventListener('click', function(e){ if (justDragged){ e.preventDefault(); e.stopPropagation(); } }, true);
+  gridEl.addEventListener('dragstart', function(e){ e.preventDefault(); });
 
   window.addEventListener('resize', updateArrows);
   render();
