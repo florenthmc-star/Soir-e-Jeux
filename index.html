@@ -30,7 +30,19 @@ h1{margin:4px 0 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:cla
 .pill:hover{border-color:var(--muted)}
 .pill[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:var(--bg);font-weight:600}
 
-.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.6vw,28px)}
+.railwrap{position:relative;flex:1;min-height:0;display:flex}
+.grid{flex:1;min-height:0;display:flex;gap:clamp(12px,1.4vw,24px);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;padding-bottom:12px;scrollbar-width:thin;scrollbar-color:var(--pill) transparent;-webkit-overflow-scrolling:touch}
+.grid::-webkit-scrollbar{height:8px}
+.grid::-webkit-scrollbar-thumb{background:var(--pill);border-radius:999px}
+.grid > .card{flex:0 0 clamp(280px,27vw,420px);scroll-snap-align:start}
+.grid.drag{scroll-snap-type:none;scroll-behavior:auto;cursor:grabbing;user-select:none}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:48px;height:48px;border-radius:999px;border:1px solid var(--pill);background:rgba(23,25,30,.92);color:var(--text);font:700 22px 'Chakra Petch',system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.arrow:hover{border-color:var(--muted)}
+.arrow[hidden]{display:none}
+.arrow.prev{left:-14px}
+.arrow.next{right:-14px}
+.count{font-size:clamp(12px,1.5vh,15px);color:var(--muted)}
+@media (pointer:coarse){ .arrow{display:none} }
 .card{display:flex;flex-direction:column;min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
 .card.mine{border-color:var(--c);box-shadow:0 0 0 1px var(--c)}
 .card .bar{flex:none;height:8px;background:var(--c)}
@@ -70,10 +82,15 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
 @media (max-height:700px) and (min-width:981px){ .desc{display:none} }
 
 /* Petits écrans (téléphone, fenêtre étroite) : on empile et on autorise le défilement */
-@media (max-width:980px), (max-height:560px){
+@media (max-width:760px){
   .page{height:auto;min-height:100dvh}
-  .grid{grid-template-columns:1fr}
+  .railwrap{flex:none}
+  .grid > .card{flex-basis:86vw}
   .right{align-items:flex-start}
+}
+@media (max-height:520px){
+  .page{height:auto;min-height:100dvh}
+  .railwrap{min-height:480px}
 }
 </style>
 </head>
@@ -91,12 +108,17 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     </div>
   </header>
 
-  <main class="grid" id="grid"></main>
+  <div class="railwrap">
+    <button type="button" class="arrow prev" id="prev" aria-label="Jeux précédents" hidden>&#8249;</button>
+    <main class="grid" id="grid" tabindex="0" aria-label="Les jeux, faire défiler vers la droite"></main>
+    <button type="button" class="arrow next" id="next" aria-label="Jeux suivants" hidden>&#8250;</button>
+  </div>
 
   <div class="banner">
     <div class="big">4 jeux gratuits sur 5, seul Helldivers 2 est payant. Votez !</div>
     <div class="right">
       <div class="leader" id="leader" aria-live="polite"></div>
+      <div class="count" id="count"></div>
       <p class="status" id="status" role="status"></p>
     </div>
   </div>
@@ -105,7 +127,7 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
 <script>
 (function(){
   // ⚙️ URL de ton déploiement Apps Script (se termine par /exec)
-  var API_URL = 'COLLE_ICI_TON_URL_EXEC';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbzdOxivRDLAQTvec8yoe0SssCrpdUyPffNJcF_wYS1NfoVhpFX6luHrM9XEKU7Rxrz9dw/exec';
 
   var PEOPLE = [
     {name:'Joachim', platform:'Xbox'},
@@ -185,8 +207,8 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     PEOPLE.forEach(function(p){ var g = state.votes[p.name]; if (res[g]) res[g].push(p.name); });
     var myGame = state.who ? state.votes[state.who] : null;
 
+    var keepScroll = gridEl.scrollLeft;
     gridEl.textContent = '';
-    gridEl.style.gridTemplateColumns = window.matchMedia('(max-width:980px), (max-height:560px)').matches ? '' : 'repeat(' + GAMES.length + ',minmax(0,1fr))';
     GAMES.forEach(function(g){
       var card = el('article','card' + (myGame === g.id ? ' mine' : ''));
       card.style.setProperty('--c', g.color);
@@ -230,6 +252,11 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
       card.appendChild(inner);
       gridEl.appendChild(card);
     });
+    gridEl.style.scrollBehavior = 'auto';
+    gridEl.scrollLeft = keepScroll;
+    gridEl.style.scrollBehavior = '';
+    updateArrows();
+    document.getElementById('count').textContent = GAMES.length + ' jeux \u00b7 fais défiler vers la droite \u2192';
 
     var total = Object.keys(state.votes).filter(function(k){ return res[state.votes[k]]; }).length;
     var sorted = GAMES.map(function(g){ return {g:g, n:res[g.id].length}; }).sort(function(a,b){ return b.n - a.n; });
@@ -259,7 +286,49 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     api({action:'votes'}).then(function(v){ state.votes = v; render(); }).catch(function(){});
   }
 
-  window.addEventListener('resize', render);
+  // Défilement horizontal : flèches, molette, glisser à la souris
+  var prevBtn = document.getElementById('prev');
+  var nextBtn = document.getElementById('next');
+  function step(){ var c = gridEl.querySelector('.card'); return c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(gridEl).columnGap || 16) : 300; }
+  function updateArrows(){
+    var max = gridEl.scrollWidth - gridEl.clientWidth;
+    prevBtn.hidden = gridEl.scrollLeft <= 4;
+    nextBtn.hidden = gridEl.scrollLeft >= max - 4;
+  }
+  prevBtn.addEventListener('click', function(){ gridEl.scrollBy({left:-step(), behavior:'smooth'}); });
+  nextBtn.addEventListener('click', function(){ gridEl.scrollBy({left:step(), behavior:'smooth'}); });
+  gridEl.addEventListener('scroll', updateArrows, {passive:true});
+  gridEl.addEventListener('wheel', function(e){
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && gridEl.scrollWidth > gridEl.clientWidth){
+      e.preventDefault();
+      gridEl.scrollBy({left:e.deltaY, behavior:'auto'});
+    }
+  }, {passive:false});
+  gridEl.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight'){ e.preventDefault(); gridEl.scrollBy({left:step(), behavior:'smooth'}); }
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); gridEl.scrollBy({left:-step(), behavior:'smooth'}); }
+  });
+  var drag = null;
+  gridEl.addEventListener('pointerdown', function(e){
+    if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('button')) return;
+    drag = {x:e.clientX, left:gridEl.scrollLeft, moved:false};
+  });
+  window.addEventListener('pointermove', function(e){
+    if (!drag) return;
+    var dx = e.clientX - drag.x;
+    if (!drag.moved && Math.abs(dx) > 5){ drag.moved = true; gridEl.classList.add('drag'); }
+    if (drag.moved) gridEl.scrollLeft = drag.left - dx;
+  });
+  window.addEventListener('pointerup', function(){
+    if (!drag) return;
+    var moved = drag.moved; drag = null;
+    if (moved){
+      gridEl.classList.remove('drag');
+      var w = step(); gridEl.scrollTo({left:Math.round(gridEl.scrollLeft / w) * w, behavior:'smooth'});
+    }
+  });
+
+  window.addEventListener('resize', updateArrows);
   render();
   if (API_URL.indexOf('http') !== 0) setStatus('Colle l\u2019URL /exec d\u2019Apps Script dans API_URL (index.html).');
   else { refresh(); setInterval(refresh, 5000); }
