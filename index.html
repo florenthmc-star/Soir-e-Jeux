@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Soirée jeux</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
+<html lang="fr"><head>
+<meta charset="utf-8" data-keep="">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" data-keep="">
+<title data-keep="">Soirée jeux</title>
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;🎮&lt;/text&gt;&lt;/svg&gt;" data-keep="">
+<link rel="preconnect" href="https://fonts.googleapis.com" data-keep="">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet" data-keep="">
+<style data-keep="">
 :root{
   --bg:#0E0F12; --panel:#17191E; --line:#2A2D35; --pill:#3A3D46;
   --text:#F2F3F5; --soft:#D5D8DE; --body:#C3C7CF; --muted:#9EA3AE;
@@ -16,9 +15,10 @@
 *,*::before,*::after{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans','Segoe UI',system-ui,sans-serif}
+.app{display:flex;height:100vh;height:100dvh}
 
 /* Tout tient dans l'écran : la page fait exactement la hauteur de la fenêtre */
-.page{height:100vh;height:100dvh;max-width:1800px;margin:0 auto;padding:clamp(12px,3vh,44px) clamp(14px,3vw,56px);display:flex;flex-direction:column;gap:var(--gap)}
+.page{flex:1;min-width:0;height:100%;max-width:1800px;margin:0 auto;padding:clamp(12px,3vh,44px) clamp(14px,3vw,56px);display:flex;flex-direction:column;gap:var(--gap)}
 
 .head{flex:none;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 32px}
 .eyebrow{font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(12px,1.7vh,17px);font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
@@ -30,23 +30,24 @@ h1{margin:4px 0 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:cla
 .pill:hover{border-color:var(--muted)}
 .pill[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:var(--bg);font-weight:600}
 
+/* Carrousel des cartes */
 .railwrap{position:relative;flex:1;min-height:0;display:flex}
-.grid{flex:1;min-height:0;display:flex;gap:clamp(12px,1.4vw,24px);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;padding-bottom:12px;scrollbar-width:thin;scrollbar-color:var(--pill) transparent;-webkit-overflow-scrolling:touch}
+.grid{flex:1;min-height:0;display:flex;gap:clamp(12px,1.4vw,24px);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scroll-behavior:smooth;overscroll-behavior-x:contain;padding-bottom:12px;scrollbar-width:thin;scrollbar-color:var(--pill) transparent;-webkit-overflow-scrolling:touch;cursor:grab}
 .grid::-webkit-scrollbar{height:8px}
 .grid::-webkit-scrollbar-thumb{background:var(--pill);border-radius:999px}
-.grid > .card{flex:0 0 clamp(280px,27vw,420px);scroll-snap-align:start}
-.grid{cursor:grab}
 .grid button{cursor:pointer}
 .grid.drag{scroll-snap-type:none !important;scroll-behavior:auto !important;cursor:grabbing}
 .grid.drag *{user-select:none;pointer-events:none}
+.grid > .card{flex:0 0 clamp(280px,27vw,420px);scroll-snap-align:start}
+.grid > .card:last-child{scroll-snap-align:end}
 .arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:48px;height:48px;border-radius:999px;border:1px solid var(--pill);background:rgba(23,25,30,.92);color:var(--text);font:700 22px 'Chakra Petch',system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.45)}
 .arrow:hover{border-color:var(--muted)}
 .arrow[hidden]{display:none}
 .arrow.prev{left:-14px}
 .arrow.next{right:-14px}
-.count{font-size:clamp(12px,1.5vh,15px);color:var(--muted)}
 @media (pointer:coarse){ .arrow{display:none} }
-.card{display:flex;flex-direction:column;min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+
+.card{position:relative;display:flex;flex-direction:column;min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
 .card.mine{border-color:var(--c);box-shadow:0 0 0 1px var(--c)}
 .card .bar{flex:none;height:8px;background:var(--c)}
 .card .in{flex:1;min-height:0;padding:clamp(10px,2vh,28px) clamp(12px,1.3vw,26px);display:flex;flex-direction:column;gap:clamp(6px,1.3vh,16px)}
@@ -63,7 +64,6 @@ h1{margin:4px 0 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:cla
 .pt.plus b{color:var(--c)}
 .pt.minus b{color:var(--muted)}
 .pt.minus span{color:var(--body)}
-
 .votezone{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:clamp(6px,1.3vh,16px);border-top:1px solid var(--line)}
 .tally{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0}
 .num{font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(20px,3.2vh,34px);font-weight:700;line-height:1}
@@ -72,118 +72,385 @@ h1{margin:4px 0 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:cla
 .votebtn{flex:none;min-height:clamp(34px,4.6vh,48px);padding:0 14px;border-radius:12px;border:2px solid var(--c);background:transparent;color:var(--text);font:600 clamp(13px,1.7vh,16px) 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
 .votebtn:hover{background:rgba(255,255,255,.05)}
 .card.mine .votebtn{background:var(--c);color:#141414}
+.votebtn:disabled{border-color:var(--pill);color:var(--muted);cursor:not-allowed;background:transparent}
+
+/* Carte "vote bloqué" (la blague) */
+.card.nope .bar,.card.nope .in{filter:grayscale(1);opacity:.45}
+.ribbon{position:absolute;left:-25%;right:-25%;top:44%;transform:rotate(-24deg);background:#E0262B;color:#fff;text-align:center;padding:clamp(10px,1.8vh,18px) 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-weight:700;font-size:clamp(20px,3.4vh,34px);letter-spacing:4px;text-transform:uppercase;box-shadow:0 10px 30px rgba(0,0,0,.55);border-top:3px solid #FF6B6F;border-bottom:3px solid #8E0E12;z-index:1;pointer-events:none}
 
 .banner{flex:none;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 28px;padding:clamp(10px,2vh,24px) clamp(16px,2vw,32px);background:var(--panel);border:1px solid var(--line);border-radius:14px}
 .banner .big{font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(16px,2.5vh,24px);font-weight:700}
 .right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
 .leader{font-size:clamp(14px,1.8vh,18px);color:var(--soft)}
+.count{font-size:clamp(12px,1.5vh,15px);color:var(--muted)}
 .status{font-size:clamp(12px,1.5vh,14px);color:var(--muted);margin:0}
 .status:empty{display:none}
-button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--text);outline-offset:2px}
 
-/* Écrans peu hauts (petit portable) : on masque la description pour tout garder visible */
+/* Éditeur (panneau de droite) */
+.editor{flex:0 0 400px;height:100%;display:flex;flex-direction:column;background:#121318;border-left:1px solid var(--line)}
+.editor[hidden]{display:none}
+.ed-head{flex:none;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.ed-head strong{font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:20px}
+.ed-body{flex:1;min-height:0;overflow-y:auto;padding:14px 18px 24px;display:flex;flex-direction:column;gap:18px}
+.ed-foot{flex:none;display:flex;flex-direction:column;gap:8px;padding:14px 18px;border-top:1px solid var(--line)}
+.ed-sec{display:flex;flex-direction:column;gap:10px}
+.ed-sec > h3{margin:0;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.ed label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.ed input[type=text],.ed textarea{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--pill);background:var(--panel);color:var(--text);font:14px 'IBM Plex Sans',system-ui,sans-serif}
+.ed textarea{resize:vertical;min-height:58px;line-height:1.4}
+.ed .row{display:flex;gap:8px;align-items:flex-end}
+.ed .row > label{flex:1}
+.ed details{border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.ed summary{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;font-weight:600;list-style:none}
+.ed summary::-webkit-details-marker{display:none}
+.ed .dot{width:14px;height:14px;border-radius:50%;background:var(--c);flex:none}
+.ed .gbody{display:flex;flex-direction:column;gap:10px;padding:4px 12px 14px}
+.ed .check{flex-direction:row;align-items:center;gap:8px;color:var(--soft)}
+.ed input[type=color]{width:44px;height:36px;padding:0;border:1px solid var(--pill);border-radius:8px;background:none;cursor:pointer}
+.ed .tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn{min-height:38px;padding:0 14px;border-radius:9px;border:1px solid var(--pill);background:transparent;color:var(--text);font:600 14px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn.danger{color:#FF8A8A;border-color:#5A2A2E}
+.btn.small{min-height:32px;padding:0 10px;font-size:13px}
+.btn[disabled]{opacity:.4;cursor:default}
+.ed-msg{font-size:13px;color:var(--muted);min-height:1.3em;margin:0}
+.ed-hint{font-size:12px;color:var(--muted);margin:0}
+.fab{position:fixed;right:16px;bottom:16px;z-index:5}
+.fab[hidden]{display:none}
+
 @media (max-height:700px) and (min-width:981px){ .desc{display:none} }
-
-/* Petits écrans (téléphone, fenêtre étroite) : on empile et on autorise le défilement */
 @media (max-width:760px){
+  .app{height:auto;min-height:100dvh}
   .page{height:auto;min-height:100dvh}
   .railwrap{flex:none}
   .grid > .card{flex-basis:86vw}
   .right{align-items:flex-start}
 }
+@media (max-width:1100px){
+  .editor{position:fixed;inset:0 0 0 auto;width:min(420px,100vw);z-index:10;box-shadow:-10px 0 40px rgba(0,0,0,.5)}
+}
 @media (max-height:520px){
-  .page{height:auto;min-height:100dvh}
+  .app,.page{height:auto;min-height:100dvh}
   .railwrap{min-height:480px}
 }
 </style>
 </head>
 <body>
-<div class="page">
+<div class="app" data-keep="">
+  <div class="page">
+    <header class="head">
+      <div>
+        <div class="eyebrow" id="eyebrow" data-clear=""></div>
+        <h1 id="title" data-clear=""></h1>
+      </div>
+      <div class="whoblock">
+        <div class="wholabel" id="wholabel" data-clear=""></div>
+        <div class="pills" id="pills" data-clear=""></div>
+      </div>
+    </header>
 
-  <header class="head">
-    <div>
-      <div class="eyebrow">Soirée jeux · Jeudi 8 octobre - Flo, Joachim &amp; Seb</div>
-      <h1>On joue à quoi ?</h1>
+    <div class="railwrap">
+      <button type="button" class="arrow prev" id="prev" aria-label="Jeux précédents" hidden="">‹</button>
+      <main class="grid" id="grid" tabindex="0" aria-label="Les jeux, faire défiler vers la droite" data-clear=""></main>
+      <button type="button" class="arrow next" id="next" aria-label="Jeux suivants" hidden="">›</button>
     </div>
-    <div class="whoblock">
-      <div class="wholabel" id="wholabel">Clique sur ton prénom pour voter</div>
-      <div class="pills" id="pills"></div>
-    </div>
-  </header>
 
-  <div class="railwrap">
-    <button type="button" class="arrow prev" id="prev" aria-label="Jeux précédents" hidden>&#8249;</button>
-    <main class="grid" id="grid" tabindex="0" aria-label="Les jeux, faire défiler vers la droite"></main>
-    <button type="button" class="arrow next" id="next" aria-label="Jeux suivants" hidden>&#8250;</button>
+    <div class="banner">
+      <div class="big" id="bannerText" data-clear=""></div>
+      <div class="right">
+        <div class="leader" id="leader" aria-live="polite" data-clear=""></div>
+        <div class="count" id="count" data-clear=""></div>
+        <p class="status" id="status" role="status" data-clear=""></p>
+      </div>
+    </div>
   </div>
-
-  <div class="banner">
-    <div class="big">4 jeux gratuits sur 5, seul Helldivers 2 est payant. Votez !</div>
-    <div class="right">
-      <div class="leader" id="leader" aria-live="polite"></div>
-      <div class="count" id="count"></div>
-      <p class="status" id="status" role="status"></p>
-    </div>
-  </div>
+  <aside class="editor ed" id="editor" aria-label="Modifier la page" data-clear="" hidden=""></aside>
 </div>
+<button type="button" class="btn primary fab" id="fab" hidden="" data-keep="">✏️ Modifier</button>
 
-<script>
+<!-- Contenu de la page : modifiable avec l'éditeur (ou à la main) -->
+<script type="application/json" id="site-data" data-keep="">
+{
+  "eyebrow": "Soirée jeux · Jeudi 8 octobre - Flo, Joachim & Seb",
+  "title": "On joue à quoi ?",
+  "banner": "5 jeux gratuits sur 6, seul Helldivers 2 est payant. Votez !",
+  "people": [
+    {
+      "name": "Joachim",
+      "platform": "Xbox"
+    },
+    {
+      "name": "Seb",
+      "platform": "PlayStation / PC / Switch"
+    },
+    {
+      "name": "Flo",
+      "platform": "PC / Xbox / Playstation / Switch"
+    }
+  ],
+  "games": [
+    {
+      "id": "finals",
+      "name": "The Finals",
+      "color": "#FF7A1A",
+      "tag": "Notre classique",
+      "desc": "FPS en arène où tout le décor se détruit : on rase des bâtiments pour piquer l’argent aux autres équipes.",
+      "specs": [
+        [
+          "Vue",
+          "1re personne"
+        ],
+        [
+          "Équipes",
+          "Escouades de 3"
+        ],
+        [
+          "Prix",
+          "Gratuit"
+        ],
+        [
+          "Crossplay",
+          "PC · PS5 · Xbox"
+        ]
+      ],
+      "plus": [
+        "Escouade de 3, on joue entre nous sans random.",
+        "On connaît déjà le jeu, zéro temps d’apprentissage"
+      ],
+      "minus": [
+        "Pas de nouveauté, c’est notre jeu habituel"
+      ]
+    },
+    {
+      "id": "rivals",
+      "name": "Marvel Rivals",
+      "color": "#5B9BFF",
+      "tag": "La nouveauté",
+      "desc": "Hero shooter avec les super-héros Marvel : chacun choisit un personnage aux pouvoirs uniques et un rôle dans l’équipe : Dps , soutien, tank etc...",
+      "specs": [
+        [
+          "Vue",
+          "3e personne"
+        ],
+        [
+          "Équipes",
+          "6 contre 6"
+        ],
+        [
+          "Prix",
+          "Gratuit"
+        ],
+        [
+          "Crossplay",
+          "PC · PS5 · Xbox"
+        ]
+      ],
+      "plus": [
+        "Du nouveau, et des rôles soutien où chacun peut s’amuser.",
+        "Beaucoup, beaucoup de héros"
+      ],
+      "minus": [
+        "Équipes de 6 : on joue avec 3 randoms.",
+        "Crossplay PC/console en parties normales seulement, pas en classé"
+      ]
+    },
+    {
+      "id": "fall",
+      "name": "Fall Guys",
+      "color": "#FF8FC8",
+      "tag": "La soirée fun",
+      "desc": "Party game à obstacles : des manches courtes qui peuvent être drôles et où il faut survivre jusqu’à la couronne finale.",
+      "specs": [
+        [
+          "Vue",
+          "3e personne"
+        ],
+        [
+          "Équipes",
+          "Solo ou escouade"
+        ],
+        [
+          "Prix",
+          "Gratuit"
+        ],
+        [
+          "Crossplay",
+          "PC · PS5 · Xbox · Switch"
+        ]
+      ],
+      "plus": [
+        "Fous rires, le niveau ne compte pas beaucoup : tout le monde peut gagner",
+        "Ultra simple, on le prend en main en deux minutes"
+      ],
+      "minus": [
+        "Pas de tir : plus détente que compétitif",
+        "Compte Epic Games nécessaire"
+      ]
+    },
+    {
+      "id": "rocket",
+      "name": "Rocket League",
+      "color": "#2EC4B6",
+      "tag": "Le foot en voiture",
+      "desc": "Du foot avec des voitures à réaction : sauts, acrobaties aériennes et buts de folie, en parties de 5 minutes à peu près.",
+      "specs": [
+        [
+          "Vue",
+          "3e personne"
+        ],
+        [
+          "Équipes",
+          "3 contre 3"
+        ],
+        [
+          "Prix",
+          "Gratuit"
+        ],
+        [
+          "Crossplay",
+          "PC · PS5 · Xbox · Switch"
+        ]
+      ],
+      "plus": [
+        "Le 3v3, pile pour nous trois",
+        "Parties courtes, on enchaîne facilement"
+      ],
+      "minus": [
+        "Facile à prendre en main, dur à maîtriser",
+        "Compte Epic Games nécessaire"
+      ]
+    },
+    {
+      "id": "destiny",
+      "name": "Destiny 2",
+      "color": "#B99CFF",
+      "tag": "Le PvP culte",
+      "desc": "Le Crucible, le PvP de Destiny 2 : des affrontements nerveux avec armes et super-pouvoirs, en 3v3 ou 6v6.",
+      "specs": [
+        [
+          "Vue",
+          "1re personne"
+        ],
+        [
+          "Équipes",
+          "3v3 ou 6v6"
+        ],
+        [
+          "Prix",
+          "Gratuit (New Light)"
+        ],
+        [
+          "Crossplay",
+          "PC · PS5 · Xbox"
+        ]
+      ],
+      "plus": [
+        "Un des meilleurs gunplay du genre",
+        "Modes 3v3 pile pour nous trois",
+        "PVP ou PVE possible.",
+        "Simple à prendre en main mais dur à perfectionner."
+      ],
+      "minus": [
+        "On sera dans des parties joueurs PC ( mais c'est des merguez )."
+      ]
+    },
+    {
+      "id": "helldivers",
+      "name": "Helldivers 2",
+      "color": "#ffa200",
+      "tag": "La coop / ou pas",
+      "desc": "Shooter coop contre aliens et robots etc.. : on enchaîne les missions en escouade et on appelle des frappes orbitales ( sur les ennemies ou alliés ) ",
+      "specs": [
+        [
+          "Vue",
+          "3e personne"
+        ],
+        [
+          "Équipes",
+          "Coop jusqu’à 4"
+        ],
+        [
+          "Prix",
+          "39,99 € (dès ~25 € en clé)"
+        ],
+        [
+          "Crossplay",
+          "PC · PS5 · Xbox"
+        ]
+      ],
+      "plus": [
+        "100 % coop : tout le monde est utile",
+        "Tir allié activé, fous rires grandement possible et brisage d'amitié probable"
+      ],
+      "minus": [
+        "Pas de PvP",
+        "Payant pour chacun, + Game Pass / PS Plus en ligne"
+      ]
+    },
+    {
+      "id": "fortnite",
+      "name": "Fortnite",
+      "color": "#9AA0AA",
+      "tag": "La demande de Seb",
+      "desc": "Battle royale à 100 joueurs : on saute du bus, on ramasse des armes et on s'encule.",
+      "specs": [
+        [
+          "Vue",
+          "3e personne"
+        ],
+        [
+          "Équipes",
+          "Solo à escouade"
+        ],
+        [
+          "Prix",
+          "Gratuit"
+        ],
+        [
+          "Crossplay",
+          "Partout"
+        ]
+      ],
+      "plus": [
+        "Seb aime bien"
+      ],
+      "minus": [
+        "Personne d’autre ne veut y jouer",
+        "Vraiment personne"
+      ],
+      "blocked": true,
+      "ribbon": "Jamais de la vie"
+    }
+  ]
+}
+</script>
+
+<script data-keep="">
 (function(){
   // ⚙️ URL de ton déploiement Apps Script (se termine par /exec)
   var API_URL = 'https://script.google.com/macros/s/AKfycbzdOxivRDLAQTvec8yoe0SssCrpdUyPffNJcF_wYS1NfoVhpFX6luHrM9XEKU7Rxrz9dw/exec';
 
-  var PEOPLE = [
-    {name:'Joachim', platform:'Xbox'},
-    {name:'Seb', platform:'PlayStation'},
-    {name:'Flo', platform:'PC'}
-  ];
+  var DATA = JSON.parse(document.getElementById('site-data').textContent);
+  var IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
+  var EDIT_PARAM = /[?&]edit=1\b/.test(location.search);
 
-  // Pour ajouter un jeu : l'ajouter ici ET dans GAMES de Code.gs (même id)
-  var GAMES = [
-    { id:'finals', name:'The Finals', color:'#FF7A1A', tag:'Notre classique',
-      desc:'FPS en arène où tout le décor se détruit : on rase des bâtiments pour piquer l\u2019argent aux autres équipes.',
-      specs:[['Vue','1re personne'],['Équipes','Escouades de 3'],['Prix','Gratuit'],['Crossplay','PC · PS5 · Xbox']],
-      plus:['Escouade de 3, on joue entre nous sans inconnu','On connaît déjà le jeu, zéro temps d\u2019apprentissage'],
-      minus:['Pas de nouveauté, c\u2019est notre jeu habituel'] },
-    { id:'rivals', name:'Marvel Rivals', color:'#5B9BFF', tag:'La nouveauté',
-      desc:'Hero shooter avec les super-héros Marvel : chacun choisit un personnage aux pouvoirs uniques et un rôle dans l\u2019équipe.',
-      specs:[['Vue','3e personne'],['Équipes','6 contre 6'],['Prix','Gratuit'],['Crossplay','PC · PS5 · Xbox']],
-      plus:['Du neuf, et des rôles soutien où chacun peut s\u2019amuser','Beaucoup de héros'],
-      minus:['Équipes de 6 : on joue avec 3 inconnus','Crossplay PC/console en parties normales seulement, pas en classé'] },
-    { id:'fall', name:'Fall Guys', color:'#FF8FC8', tag:'La soirée fun',
-      desc:'Party game à obstacles : des manches courtes et loufoques où il faut survivre jusqu\u2019à la couronne finale.',
-      specs:[['Vue','3e personne'],['Équipes','Solo ou escouade'],['Prix','Gratuit'],['Crossplay','PC · PS5 · Xbox · Switch']],
-      plus:['Fous rires, le niveau compte peu : tout le monde peut gagner','Ultra simple, on le prend en main en deux minutes'],
-      minus:['Pas de tir : plus détente que compétitif','Compte Epic Games nécessaire'] },
-    { id:'destiny', name:'Destiny 2', color:'#B99CFF', tag:'Le PvP culte',
-      desc:'Le Crucible, le PvP de Destiny 2 : des affrontements nerveux avec armes et super-pouvoirs, en 3v3 ou 6v6.',
-      specs:[['Vue','1re personne'],['Équipes','3v3 ou 6v6'],['Prix','Gratuit (New Light)'],['Crossplay','PC · PS5 · Xbox']],
-      plus:['Un des meilleurs gunplay du genre','Modes 3v3 pile pour nous trois'],
-      minus:['Avec Flo sur PC, on affronte des joueurs PC','Prise en main longue, jeu figé depuis juin 2026'] },
-    { id:'helldivers', name:'Helldivers 2', color:'#FFD23F', tag:'La coop',
-      desc:'Shooter coop contre aliens et robots : on enchaîne les missions en escouade et on appelle des frappes orbitales.',
-      specs:[['Vue','3e personne'],['Équipes','Coop jusqu\u2019à 4'],['Prix','39,99 € (dès ~25 € en clé)'],['Crossplay','PC · PS5 · Xbox']],
-      plus:['100 % coop : tout le monde est utile','Tir allié activé, fous rires garantis'],
-      minus:['Pas de PvP','Payant pour chacun, + Game Pass / PS Plus en ligne'] }
-  ];
+  var state = { who:null, votes:{}, busy:false, loaded:false, dirty:false };
+  try { var s = localStorage.getItem('vote-who'); if (s) state.who = s; } catch(e){}
 
-  var state = { who:null, votes:{}, busy:false };
-  try { var s = localStorage.getItem('vote-who'); if (PEOPLE.some(function(p){return p.name===s;})) state.who = s; } catch(e){}
-
-  var pillsEl = document.getElementById('pills');
-  var whoLabel = document.getElementById('wholabel');
-  var gridEl = document.getElementById('grid');
-  var leaderEl = document.getElementById('leader');
-  var statusEl = document.getElementById('status');
+  var $ = function(id){ return document.getElementById(id); };
+  var gridEl = $('grid'), statusEl = $('status');
   function setStatus(t){ statusEl.textContent = t || ''; }
-
   function el(tag, cls, text){
     var e = document.createElement(tag);
     if (cls) e.className = cls;
     if (text != null) e.textContent = text;
     return e;
   }
+  function activeGames(){ return DATA.games.filter(function(g){ return !g.blocked; }); }
 
+  // ---------- API des votes (Apps Script) ----------
   function api(params){
     var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
     return fetch(API_URL + '?' + qs, { method:'GET', redirect:'follow' })
@@ -196,10 +463,16 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
       });
   }
 
+  // ---------- Rendu de la page ----------
   function render(){
-    pillsEl.textContent = '';
-    PEOPLE.forEach(function(p){
-      var b = el('button','pill', p.name + ' · ' + p.platform);
+    $('eyebrow').textContent = DATA.eyebrow || '';
+    $('title').textContent = DATA.title || '';
+    $('bannerText').textContent = DATA.banner || '';
+
+    var pills = $('pills'); pills.textContent = '';
+    if (state.who && !DATA.people.some(function(p){ return p.name === state.who; })) state.who = null;
+    DATA.people.forEach(function(p){
+      var b = el('button','pill', p.name + (p.platform ? ' · ' + p.platform : ''));
       b.type = 'button';
       b.setAttribute('aria-pressed', state.who === p.name ? 'true' : 'false');
       b.addEventListener('click', function(){
@@ -207,82 +480,88 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
         try { localStorage.setItem('vote-who', p.name); } catch(e){}
         setStatus(''); render();
       });
-      pillsEl.appendChild(b);
+      pills.appendChild(b);
     });
-    whoLabel.textContent = state.who ? 'Tu votes en tant que ' + state.who : 'Clique sur ton prénom pour voter';
+    $('wholabel').textContent = state.who ? 'Tu votes en tant que ' + state.who : 'Clique sur ton prénom pour voter';
 
-    var res = {}; GAMES.forEach(function(g){ res[g.id] = []; });
-    PEOPLE.forEach(function(p){ var g = state.votes[p.name]; if (res[g]) res[g].push(p.name); });
+    var res = {}; DATA.games.forEach(function(g){ res[g.id] = []; });
+    DATA.people.forEach(function(p){ var g = state.votes[p.name]; if (res[g]) res[g].push(p.name); });
     var myGame = state.who ? state.votes[state.who] : null;
 
     var keepScroll = gridEl.scrollLeft;
     gridEl.textContent = '';
-    GAMES.forEach(function(g){
-      var card = el('article','card' + (myGame === g.id ? ' mine' : ''));
-      card.style.setProperty('--c', g.color);
+    DATA.games.forEach(function(g){
+      var card = el('article','card' + (myGame === g.id && !g.blocked ? ' mine' : '') + (g.blocked ? ' nope' : ''));
+      card.style.setProperty('--c', g.color || '#9EA3AE');
       card.appendChild(el('div','bar'));
       var inner = el('div','in');
 
       var top = el('div');
       top.appendChild(el('div','tag', g.tag));
       top.appendChild(el('h2', null, g.name));
-      top.appendChild(el('p','desc', g.desc));
+      if (g.desc) top.appendChild(el('p','desc', g.desc));
       inner.appendChild(top);
 
       var specs = el('div','specs');
-      g.specs.forEach(function(kv){
+      (g.specs || []).forEach(function(kv){
+        if (!kv[0] && !kv[1]) return;
         var d = el('div'); d.appendChild(el('div','k',kv[0])); d.appendChild(el('div','v',kv[1])); specs.appendChild(d);
       });
       inner.appendChild(specs);
       inner.appendChild(el('div','sep'));
 
       var pts = el('div','points');
-      pts.appendChild(el('div','k','Pour nous 3'));
-      g.plus.forEach(function(t){ var r = el('div','pt plus'); r.appendChild(el('b',null,'+')); r.appendChild(el('span',null,t)); pts.appendChild(r); });
-      g.minus.forEach(function(t){ var r = el('div','pt minus'); r.appendChild(el('b',null,'\u2013')); r.appendChild(el('span',null,t)); pts.appendChild(r); });
+      pts.appendChild(el('div','k','Pour nous ' + DATA.people.length));
+      (g.plus || []).forEach(function(t){ var r = el('div','pt plus'); r.appendChild(el('b',null,'+')); r.appendChild(el('span',null,t)); pts.appendChild(r); });
+      (g.minus || []).forEach(function(t){ var r = el('div','pt minus'); r.appendChild(el('b',null,'\u2013')); r.appendChild(el('span',null,t)); pts.appendChild(r); });
       inner.appendChild(pts);
 
       var vz = el('div','votezone');
       var tally = el('div','tally');
-      var n = res[g.id].length;
+      var n = g.blocked ? 0 : res[g.id].length;
       tally.appendChild(el('span','num', String(n)));
       tally.appendChild(el('span','lbl', n > 1 ? 'votes' : 'vote'));
-      res[g.id].forEach(function(p){ tally.appendChild(el('span','chip',p)); });
+      if (!g.blocked) res[g.id].forEach(function(p){ tally.appendChild(el('span','chip',p)); });
       vz.appendChild(tally);
-      var btn = el('button','votebtn', myGame === g.id ? 'Ton choix' : 'Voter');
+      var btn = el('button','votebtn', g.blocked ? 'Vote refusé' : (myGame === g.id ? 'Ton choix' : 'Voter'));
       btn.type = 'button';
       btn.setAttribute('aria-label', 'Voter pour ' + g.name);
       btn.setAttribute('aria-pressed', myGame === g.id ? 'true' : 'false');
-      btn.addEventListener('click', function(){ vote(g.id); });
+      if (g.blocked) btn.disabled = true;
+      btn.addEventListener('click', function(){ vote(g); });
       vz.appendChild(btn);
       inner.appendChild(vz);
 
       card.appendChild(inner);
+      if (g.blocked) card.appendChild(el('div','ribbon', g.ribbon || 'Jamais de la vie'));
       gridEl.appendChild(card);
     });
     gridEl.style.scrollBehavior = 'auto';
     gridEl.scrollLeft = keepScroll;
     gridEl.style.scrollBehavior = '';
     updateArrows();
-    document.getElementById('count').textContent = GAMES.length + ' jeux \u00b7 fais défiler vers la droite \u2192';
 
-    var total = Object.keys(state.votes).filter(function(k){ return res[state.votes[k]]; }).length;
-    var sorted = GAMES.map(function(g){ return {g:g, n:res[g.id].length}; }).sort(function(a,b){ return b.n - a.n; });
-    if (!state.loaded) leaderEl.textContent = 'Chargement des votes\u2026';
-    else if (total === 0) leaderEl.textContent = 'Personne n\u2019a encore voté.';
-    else if (sorted.length > 1 && sorted[0].n === sorted[1].n) leaderEl.textContent = '\u00c9galité pour l\u2019instant · ' + total + '/' + PEOPLE.length + ' votes';
-    else leaderEl.textContent = sorted[0].g.name + ' mène · ' + total + '/' + PEOPLE.length + ' votes';
+    var act = activeGames();
+    var counted = DATA.people.filter(function(p){ return act.some(function(g){ return g.id === state.votes[p.name]; }); }).length;
+    var sorted = act.map(function(g){ return {g:g, n:res[g.id].length}; }).sort(function(a,b){ return b.n - a.n; });
+    var leader = $('leader');
+    if (IN_CLAUDE) leader.textContent = 'Aperçu : les votes en direct sont sur la page GitHub.';
+    else if (!state.loaded) leader.textContent = 'Chargement des votes\u2026';
+    else if (counted === 0) leader.textContent = 'Personne n\u2019a encore voté.';
+    else if (sorted.length > 1 && sorted[0].n === sorted[1].n) leader.textContent = '\u00c9galité pour l\u2019instant · ' + counted + '/' + DATA.people.length + ' votes';
+    else leader.textContent = sorted[0].g.name + ' mène · ' + counted + '/' + DATA.people.length + ' votes';
+    $('count').textContent = act.length + ' jeux \u00b7 fais défiler vers la droite \u2192';
   }
 
-  function vote(gameId){
-    if (state.busy) return;
+  function vote(g){
+    if (state.busy || g.blocked) return;
+    if (IN_CLAUDE){ setStatus('Ici c\u2019est l\u2019aperçu : on vote sur la page GitHub.'); return; }
     if (!state.who){ setStatus('Clique d\u2019abord sur ton prénom en haut de la page.'); return; }
     state.busy = true;
     var who = state.who;
-    setStatus('Enregistrement du vote…');
-    api({action:'vote', who:who, game:gameId}).then(function(v){
-      state.votes = v;
-      var g = GAMES.filter(function(x){ return x.id === gameId; })[0];
+    setStatus('Enregistrement du vote\u2026');
+    api({action:'vote', who:who, game:g.id, name:g.name}).then(function(v){
+      state.votes = v; state.loaded = true;
       setStatus('Vote enregistré : ' + who + ' \u2192 ' + g.name + '.');
       render();
     }).catch(function(err){
@@ -291,7 +570,7 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
   }
 
   function refresh(){
-    if (state.busy || document.hidden) return;
+    if (state.busy || document.hidden || IN_CLAUDE) return;
     api({action:'votes'}).then(function(v){
       state.votes = v; state.loaded = true;
       if (state.loadError){ state.loadError = false; setStatus(''); }
@@ -302,9 +581,8 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     });
   }
 
-  // Défilement horizontal : flèches, molette, glisser à la souris
-  var prevBtn = document.getElementById('prev');
-  var nextBtn = document.getElementById('next');
+  // ---------- Défilement horizontal : flèches, molette, glisser ----------
+  var prevBtn = $('prev'), nextBtn = $('next');
   function step(){ var c = gridEl.querySelector('.card'); return c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(gridEl).columnGap || 16) : 300; }
   function updateArrows(){
     var max = gridEl.scrollWidth - gridEl.clientWidth;
@@ -327,7 +605,7 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
   var drag = null, justDragged = false;
   gridEl.addEventListener('mousedown', function(e){
     if (e.button !== 0 || e.target.closest('button')) return;
-    e.preventDefault(); // empêche la sélection de texte qui bloque le glisser
+    e.preventDefault();
     drag = {x:e.clientX, left:gridEl.scrollLeft, moved:false};
   });
   window.addEventListener('mousemove', function(e){
@@ -342,16 +620,237 @@ button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     if (!moved) return;
     justDragged = true; setTimeout(function(){ justDragged = false; }, 50);
     gridEl.classList.remove('drag');
-    var w = step(); gridEl.scrollTo({left:Math.round(gridEl.scrollLeft / w) * w, behavior:'smooth'});
+    var w = step(), max = gridEl.scrollWidth - gridEl.clientWidth;
+    var target = Math.round(gridEl.scrollLeft / w) * w;
+    if (max - gridEl.scrollLeft < w / 2) target = max;
+    gridEl.scrollTo({left:Math.min(target, max), behavior:'smooth'});
   });
   gridEl.addEventListener('click', function(e){ if (justDragged){ e.preventDefault(); e.stopPropagation(); } }, true);
   gridEl.addEventListener('dragstart', function(e){ e.preventDefault(); });
-
   window.addEventListener('resize', updateArrows);
+
+  // ---------- Export du fichier (contenu modifié) ----------
+  function buildHtml(){
+    var root = document.documentElement.cloneNode(true);
+    ['head','body'].forEach(function(tag){
+      var part = root.querySelector(tag);
+      Array.prototype.slice.call(part.children).forEach(function(c){ if (!c.hasAttribute('data-keep')) c.remove(); });
+      Array.prototype.slice.call(part.attributes).forEach(function(a){ part.removeAttribute(a.name); });
+    });
+    Array.prototype.slice.call(root.attributes).forEach(function(a){ if (a.name !== 'lang') root.removeAttribute(a.name); });
+    root.querySelectorAll('[data-clear]').forEach(function(e){ e.textContent = ''; e.removeAttribute('style'); });
+    root.querySelector('#editor').setAttribute('hidden','');
+    root.querySelector('#fab').setAttribute('hidden','');
+    root.querySelector('#prev').setAttribute('hidden','');
+    root.querySelector('#next').setAttribute('hidden','');
+    var grid = root.querySelector('#grid'); grid.className = 'grid';
+    var json = JSON.stringify(DATA, null, 2).replace(/</g, '\\u003c');
+    root.querySelector('#site-data').textContent = '\n' + json + '\n';
+    return '<!DOCTYPE html>\n' + root.outerHTML + '\n';
+  }
+
+  // ---------- Éditeur (panneau de droite) ----------
+  var editorEl = $('editor'), fab = $('fab');
+  var caps = { artifact:null, downloads:null };
+  var renderTimer = null;
+  function changed(){
+    state.dirty = true;
+    edMsg('Modifications non enregistrées.');
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(render, 120);
+  }
+  function edMsg(t){ var m = $('edmsg'); if (m) m.textContent = t || ''; }
+  function slug(){ return 'jeu-' + Date.now().toString(36); }
+
+  function field(label, value, onInput, multiline){
+    var l = el('label'); l.appendChild(document.createTextNode(label));
+    var i = document.createElement(multiline ? 'textarea' : 'input');
+    if (!multiline) i.type = 'text';
+    i.value = value || '';
+    i.addEventListener('input', function(){ onInput(i.value); changed(); });
+    l.appendChild(i);
+    return l;
+  }
+  function lines(v){ return v.split('\n').map(function(s){ return s.trim(); }).filter(Boolean); }
+
+  function buildEditor(){
+    var openIds = {};
+    editorEl.querySelectorAll('details[open]').forEach(function(d){ openIds[d.dataset.id] = true; });
+    editorEl.textContent = '';
+
+    var head = el('div','ed-head');
+    head.appendChild(el('strong', null, 'Modifier la page'));
+    var close = el('button','btn small','Fermer'); close.type = 'button';
+    close.addEventListener('click', function(){ editorEl.hidden = true; fab.hidden = false; updateArrows(); });
+    head.appendChild(close);
+    editorEl.appendChild(head);
+
+    var body = el('div','ed-body');
+
+    // Général
+    var gen = el('div','ed-sec'); gen.appendChild(el('h3',null,'Général'));
+    gen.appendChild(field('Sur-titre', DATA.eyebrow, function(v){ DATA.eyebrow = v; }));
+    gen.appendChild(field('Titre', DATA.title, function(v){ DATA.title = v; }));
+    gen.appendChild(field('Bandeau du bas', DATA.banner, function(v){ DATA.banner = v; }, true));
+    body.appendChild(gen);
+
+    // Joueurs
+    var ppl = el('div','ed-sec'); ppl.appendChild(el('h3',null,'Joueurs'));
+    DATA.people.forEach(function(p, i){
+      var row = el('div','row');
+      row.appendChild(field('Prénom', p.name, function(v){ p.name = v; }));
+      row.appendChild(field('Plateforme', p.platform, function(v){ p.platform = v; }));
+      var del = el('button','btn small danger','✕'); del.type = 'button'; del.setAttribute('aria-label','Supprimer ' + p.name);
+      del.addEventListener('click', function(){ DATA.people.splice(i,1); changed(); buildEditor(); });
+      row.appendChild(del);
+      ppl.appendChild(row);
+    });
+    var addP = el('button','btn small','+ Ajouter un joueur'); addP.type = 'button';
+    addP.addEventListener('click', function(){ DATA.people.push({name:'Nouveau', platform:''}); changed(); buildEditor(); });
+    ppl.appendChild(addP);
+    ppl.appendChild(el('p','ed-hint','Les votes sont liés au prénom : si tu renommes quelqu\u2019un, il devra revoter.'));
+    body.appendChild(ppl);
+
+    // Jeux
+    var gs = el('div','ed-sec'); gs.appendChild(el('h3',null,'Jeux'));
+    DATA.games.forEach(function(g, i){
+      var d = document.createElement('details'); d.dataset.id = g.id;
+      if (openIds[g.id]) d.open = true;
+      d.style.setProperty('--c', g.color);
+      var sum = document.createElement('summary');
+      sum.appendChild(el('span','dot'));
+      var sumName = el('span', null, g.name || 'Sans nom'); sum.appendChild(sumName);
+      d.appendChild(sum);
+      var gb = el('div','gbody');
+
+      gb.appendChild(field('Nom', g.name, function(v){ g.name = v; sumName.textContent = v || 'Sans nom'; }));
+      var row = el('div','row');
+      row.appendChild(field('Étiquette', g.tag, function(v){ g.tag = v; }));
+      var cl = el('label'); cl.appendChild(document.createTextNode('Couleur'));
+      var ci = document.createElement('input'); ci.type = 'color'; ci.value = /^#[0-9a-f]{6}$/i.test(g.color) ? g.color : '#9EA3AE';
+      ci.addEventListener('input', function(){ g.color = ci.value; d.style.setProperty('--c', ci.value); changed(); });
+      cl.appendChild(ci); row.appendChild(cl);
+      gb.appendChild(row);
+      gb.appendChild(field('Description', g.desc, function(v){ g.desc = v; }, true));
+
+      g.specs = g.specs || [];
+      while (g.specs.length < 4) g.specs.push(['','']);
+      g.specs.forEach(function(kv){
+        var r = el('div','row');
+        r.appendChild(field('Info', kv[0], function(v){ kv[0] = v; }));
+        r.appendChild(field('Valeur', kv[1], function(v){ kv[1] = v; }));
+        gb.appendChild(r);
+      });
+      gb.appendChild(field('Points + (un par ligne)', (g.plus || []).join('\n'), function(v){ g.plus = lines(v); }, true));
+      gb.appendChild(field('Points \u2013 (un par ligne)', (g.minus || []).join('\n'), function(v){ g.minus = lines(v); }, true));
+
+      var ck = el('label','check');
+      var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!g.blocked;
+      ck.appendChild(cb); ck.appendChild(document.createTextNode('Vote bloqué (bannière rouge)'));
+      gb.appendChild(ck);
+      var rib = field('Texte de la bannière', g.ribbon || 'Jamais de la vie', function(v){ g.ribbon = v; });
+      rib.hidden = !g.blocked;
+      cb.addEventListener('change', function(){ g.blocked = cb.checked; if (cb.checked && !g.ribbon) g.ribbon = 'Jamais de la vie'; rib.hidden = !cb.checked; changed(); });
+      gb.appendChild(rib);
+
+      var tools = el('div','tools');
+      var up = el('button','btn small','← Avant'); up.type = 'button'; up.disabled = i === 0;
+      up.addEventListener('click', function(){ DATA.games.splice(i-1, 0, DATA.games.splice(i,1)[0]); changed(); buildEditor(); });
+      var dn = el('button','btn small','Après →'); dn.type = 'button'; dn.disabled = i === DATA.games.length - 1;
+      dn.addEventListener('click', function(){ DATA.games.splice(i+1, 0, DATA.games.splice(i,1)[0]); changed(); buildEditor(); });
+      var del = el('button','btn small danger','Supprimer'); del.type = 'button';
+      del.addEventListener('click', function(){ if (confirm('Supprimer ' + (g.name || 'ce jeu') + ' ?')){ DATA.games.splice(i,1); changed(); buildEditor(); } });
+      tools.appendChild(up); tools.appendChild(dn); tools.appendChild(del);
+      gb.appendChild(tools);
+
+      d.appendChild(gb);
+      gs.appendChild(d);
+    });
+    var addG = el('button','btn small','+ Ajouter un jeu'); addG.type = 'button';
+    addG.addEventListener('click', function(){
+      var g = { id:slug(), name:'Nouveau jeu', color:'#7CD992', tag:'', desc:'', specs:[['Vue',''],['Équipes',''],['Prix',''],['Crossplay','']], plus:[], minus:[] };
+      DATA.games.push(g); changed(); buildEditor();
+      var last = editorEl.querySelector('details[data-id="' + g.id + '"]'); if (last){ last.open = true; last.scrollIntoView({block:'nearest'}); }
+      setTimeout(function(){ gridEl.scrollTo({left:gridEl.scrollWidth, behavior:'smooth'}); }, 200);
+    });
+    gs.appendChild(addG);
+    body.appendChild(gs);
+    editorEl.appendChild(body);
+
+    // Pied : enregistrer / télécharger
+    var foot = el('div','ed-foot');
+    var btns = el('div','tools');
+    if (caps.artifact){
+      var save = el('button','btn primary','Enregistrer'); save.type = 'button';
+      save.addEventListener('click', saveInClaude);
+      btns.appendChild(save);
+    }
+    var dl = el('button','btn' + (caps.artifact ? '' : ' primary'),'Télécharger index.html'); dl.type = 'button';
+    dl.addEventListener('click', download);
+    btns.appendChild(dl);
+    foot.appendChild(btns);
+    var msg = el('p','ed-msg'); msg.id = 'edmsg'; msg.setAttribute('role','status');
+    msg.textContent = state.dirty ? 'Modifications non enregistrées.' : '';
+    foot.appendChild(msg);
+    editorEl.appendChild(foot);
+  }
+
+  function saveInClaude(){
+    if (!caps.artifact) return;
+    edMsg('Enregistrement\u2026');
+    caps.artifact.publish(buildHtml()).then(function(){
+      state.dirty = false; edMsg('Enregistré.');
+    }).catch(function(e){
+      var c = e && e.code;
+      if (c === 'conflict') edMsg('Une version plus récente existe : la page va se recharger.');
+      else if (c === 'not_granted' || c === 'not_writer') edMsg('Tu n\u2019as pas le droit de modifier cette page.');
+      else if (c === 'rate_limited') edMsg('Trop d\u2019enregistrements d\u2019affilée, réessaie dans un moment.');
+      else edMsg('L\u2019enregistrement n\u2019a pas marché, réessaie.');
+    });
+  }
+
+  function download(){
+    var html = buildHtml();
+    if (caps.downloads){
+      caps.downloads.save({ filename:'index.html', data:html }).then(function(r){
+        if (r && r.status === 'saved') edMsg('Fichier index.html téléchargé.');
+      }).catch(function(e){
+        if (e && e.code === 'unavailable') edMsg('Téléchargement indisponible ici.');
+        else edMsg('Téléchargement annulé.');
+      });
+      return;
+    }
+    if (IN_CLAUDE){ edMsg('Téléchargement indisponible ici.'); return; }
+    var url = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+    var a = document.createElement('a'); a.href = url; a.download = 'index.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    edMsg('Fichier index.html téléchargé.');
+  }
+
+  function openEditor(){ buildEditor(); editorEl.hidden = false; fab.hidden = true; setTimeout(updateArrows, 50); }
+  fab.addEventListener('click', openEditor);
+  window.addEventListener('beforeunload', function(e){ if (state.dirty && !editorEl.hidden){ e.preventDefault(); e.returnValue = ''; } });
+
+  // ---------- Démarrage ----------
   render();
-  if (API_URL.indexOf('http') !== 0) setStatus('Colle l\u2019URL /exec d\u2019Apps Script dans API_URL (index.html).');
-  else { refresh(); setInterval(refresh, 5000); }
+  if (IN_CLAUDE){
+    Promise.all([window.claude.use('artifact'), window.claude.use('downloads'), window.claude.use('user')]).then(function(r){
+      caps.artifact = r[0]; caps.downloads = r[1];
+      var user = r[2];
+      var canEdit = user ? user.canEdit() : Promise.resolve(!!r[0]);
+      return Promise.resolve(canEdit).then(function(ok){
+        if (ok === false) caps.artifact = null;
+        if (caps.artifact || caps.downloads){ openEditor(); }
+      });
+    }).catch(function(){});
+  } else {
+    if (EDIT_PARAM) openEditor();
+    if (API_URL.indexOf('http') !== 0) setStatus('Colle l\u2019URL /exec d\u2019Apps Script dans API_URL (index.html).');
+    else { refresh(); setInterval(refresh, 5000); }
+  }
 })();
 </script>
-</body>
-</html>
+
+
+</body></html>
