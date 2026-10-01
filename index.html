@@ -72,7 +72,17 @@ h1{margin:4px 0 0;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:cla
 .votebtn{flex:none;min-height:clamp(34px,4.6vh,48px);padding:0 14px;border-radius:12px;border:2px solid var(--c);background:transparent;color:var(--text);font:600 clamp(13px,1.7vh,16px) 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
 .votebtn:hover{background:rgba(255,255,255,.05)}
 .card.mine .votebtn{background:var(--c);color:#141414}
-.votebtn:disabled{border-color:var(--pill);color:var(--muted);cursor:not-allowed;background:transparent}
+.votebtn:disabled,.votebtn.refused,.card.nope .votebtn.refused:hover{border-color:var(--pill);color:var(--muted);background:transparent}
+.votebtn.refused{cursor:pointer;position:relative;z-index:2}
+.popup-back{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72);animation:fade .15s ease-out}
+.popup{max-width:520px;width:100%;text-align:center;padding:36px 28px 28px;border-radius:20px;background:var(--panel);border:2px solid #E0262B;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+.popup .finger{font-size:clamp(90px,16vh,150px);line-height:1;display:block;animation:wiggle 1s ease-in-out .35s infinite}
+.popup p{margin:18px 0 24px;font-family:'Chakra Petch','Segoe UI',sans-serif;font-size:clamp(26px,4.4vh,40px);font-weight:700;line-height:1.1;color:#fff}
+.popup .btn{min-width:140px}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+@media (prefers-reduced-motion:reduce){.popup,.popup .finger,.popup-back{animation:none}}
 
 /* Carte "vote bloqué" (la blague) */
 .card.nope .bar,.card.nope .in{filter:grayscale(1);opacity:.45}
@@ -421,7 +431,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
         "Vraiment personne"
       ],
       "blocked": true,
-      "ribbon": "Jamais de la vie"
+      "ribbon": "Jamais de la vie",
+      "popup": "Va te faire foutre Seb"
     }
   ]
 }
@@ -527,7 +538,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
       btn.type = 'button';
       btn.setAttribute('aria-label', 'Voter pour ' + g.name);
       btn.setAttribute('aria-pressed', myGame === g.id ? 'true' : 'false');
-      if (g.blocked) btn.disabled = true;
+      if (g.blocked){ btn.classList.add('refused'); btn.setAttribute('aria-label', 'Vote refusé pour ' + g.name); }
       btn.addEventListener('click', function(){ vote(g); });
       vz.appendChild(btn);
       inner.appendChild(vz);
@@ -553,8 +564,28 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
     $('count').textContent = act.length + ' jeux \u00b7 fais défiler vers la droite \u2192';
   }
 
+  function showPopup(g){
+    var back = el('div','popup-back');
+    var box = el('div','popup'); box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true');
+    box.appendChild(el('span','finger', g.popupEmoji || '\uD83D\uDD95'));
+    var msg = el('p', null, g.popup || 'Va te faire foutre Seb'); msg.id = 'popup-msg';
+    box.setAttribute('aria-labelledby','popup-msg');
+    box.appendChild(msg);
+    var ok = el('button','btn primary','OK… \uD83D\uDE22'); ok.type = 'button';
+    box.appendChild(ok);
+    back.appendChild(box);
+    function close(){ back.remove(); document.removeEventListener('keydown', onKey); }
+    function onKey(e){ if (e.key === 'Escape') close(); }
+    ok.addEventListener('click', close);
+    back.addEventListener('click', function(e){ if (e.target === back) close(); });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(back);
+    ok.focus();
+  }
+
   function vote(g){
-    if (state.busy || g.blocked) return;
+    if (g.blocked){ showPopup(g); return; }
+    if (state.busy) return;
     if (IN_CLAUDE){ setStatus('Ici c\u2019est l\u2019aperçu : on vote sur la page GitHub.'); return; }
     if (!state.who){ setStatus('Clique d\u2019abord sur ton prénom en haut de la page.'); return; }
     state.busy = true;
@@ -750,8 +781,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
       gb.appendChild(ck);
       var rib = field('Texte de la bannière', g.ribbon || 'Jamais de la vie', function(v){ g.ribbon = v; });
       rib.hidden = !g.blocked;
-      cb.addEventListener('change', function(){ g.blocked = cb.checked; if (cb.checked && !g.ribbon) g.ribbon = 'Jamais de la vie'; rib.hidden = !cb.checked; changed(); });
+      var pop = field('Message du pop-up (clic sur « Vote refusé »)', g.popup || 'Va te faire foutre Seb', function(v){ g.popup = v; });
+      pop.hidden = !g.blocked;
+      cb.addEventListener('change', function(){ g.blocked = cb.checked; if (cb.checked && !g.ribbon) g.ribbon = 'Jamais de la vie'; rib.hidden = pop.hidden = !cb.checked; changed(); });
       gb.appendChild(rib);
+      gb.appendChild(pop);
 
       var tools = el('div','tools');
       var up = el('button','btn small','← Avant'); up.type = 'button'; up.disabled = i === 0;
